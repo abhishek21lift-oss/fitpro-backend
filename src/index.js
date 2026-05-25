@@ -69,7 +69,13 @@ app.post('/auth/login', async (req, res) => {
 })
 
 app.get('/auth/me', auth, async (req, res) => {
-  res.json({ user: req.user })
+  try {
+    const result = await pool.query('select id, name, email from users where id = $1', [req.user.sub])
+    if (!result.rows[0]) return res.status(404).json({ message: 'User not found' })
+    res.json({ user: result.rows[0] })
+  } catch {
+    res.status(500).json({ message: 'Failed to fetch user' })
+  }
 })
 
 app.use('/clients', clientsRoutes)

@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "seed": "node src/seed.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
