@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const { pool } = require('./db')
+const { pool, initSchema } = require('./db')
 const clientsRoutes = require('./routes/clients')
 const dietsRoutes = require('./routes/diets')
 const analyticsRoutes = require('./routes/analytics')
@@ -82,6 +82,7 @@ app.use('/clients', clientsRoutes)
 app.use('/diet-plans', dietsRoutes)
 app.use('/analytics', analyticsRoutes)
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Backend running on ${port}`)
+  await initSchema()
 })

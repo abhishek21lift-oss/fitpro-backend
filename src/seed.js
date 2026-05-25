@@ -1,8 +1,9 @@
 require('dotenv').config()
 const bcrypt = require('bcryptjs')
-const { pool } = require('./db')
+const { pool, initSchema } = require('./db')
 
 async function seed() {
+  await initSchema()
   const email = 'admin@fitpro.com'
   const password = 'fitpro123'
   const hash = await bcrypt.hash(password, 10)
