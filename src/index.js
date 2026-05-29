@@ -4,16 +4,12 @@ const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { pool, initSchema } = require('./db')
-const clientsRoutes = require('./routes/clients')
-const dietsRoutes = require('./routes/diets')
-const analyticsRoutes = require('./routes/analytics')
-const { auth } = require('./middleware/auth')
 
 const app = express()
 const port = process.env.PORT || 5000
 const frontendUrl = process.env.FRONTEND_URL
 
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
@@ -68,7 +64,7 @@ app.post('/auth/login', async (req, res) => {
   }
 })
 
-app.get('/auth/me', auth, async (req, res) => {
+app.get('/auth/me', require('./middleware/auth').auth, async (req, res) => {
   try {
     const result = await pool.query('select id, name, email from users where id = $1', [req.user.sub])
     if (!result.rows[0]) return res.status(404).json({ message: 'User not found' })
@@ -78,9 +74,12 @@ app.get('/auth/me', auth, async (req, res) => {
   }
 })
 
-app.use('/clients', clientsRoutes)
-app.use('/diet-plans', dietsRoutes)
-app.use('/analytics', analyticsRoutes)
+app.use('/clients', require('./routes/clients'))
+app.use('/diet-plans', require('./routes/diets'))
+app.use('/workout-plans', require('./routes/workouts'))
+app.use('/engine', require('./routes/engine').router)
+app.use('/re-evaluate', require('./routes/re_evaluate'))
+app.use('/analytics', require('./routes/analytics'))
 
 app.listen(port, async () => {
   console.log(`Backend running on ${port}`)
